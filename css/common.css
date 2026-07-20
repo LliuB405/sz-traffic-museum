@@ -1,0 +1,456 @@
+/* ============================================================
+ *  深圳改革开放交通发展数字博物馆 - 全局共用样式
+ *  文件：css/common.css
+ *  用途：CSS变量体系、样式重置、页面布局、横幅、导航、页脚
+ *  风格：藏青复古文博风格
+ * ============================================================ */
+
+/* ============================================================
+ *  一、CSS 自定义属性（设计Token）
+ *  集中管理颜色、字号、间距、阴影等，便于全局统一
+ * ============================================================ */
+:root {
+    /* -------- 色彩体系 -------- */
+    /* 页面背景色系 */
+    --color-bg-primary:    #F7F5F0;   /* 页面主背景 - 米白（宣纸色） */
+    --color-bg-secondary:  #EDE8DE;   /* 次级背景 - 浅米色（展台底色） */
+    --color-bg-card:       #FFFDF8;   /* 卡片背景 - 暖白（展品衬底） */
+
+    /* 藏青色系 - 横幅/导航/深色区域 */
+    --color-navy-deep:     #1A2F44;   /* 深藏青 - 横幅主色 */
+    --color-navy-light:    #2C4A6B;   /* 浅藏青 - hover交互状态 */
+    --color-navy-dark:     #0F1F2E;   /* 极深藏青 - 文字强调/页脚背景 */
+
+    /* 原木色系 - 相框/展品边框 */
+    --color-wood:          #B8A288;   /* 原木色 - 相框外边框 */
+    --color-wood-light:    #D4C4AE;   /* 浅原木 - 相框内衬/卡纸 */
+    --color-wood-dark:     #9A8268;   /* 深原木 - 暗部/阴影加深 */
+
+    /* 复古金色系 - 点缀/强调 */
+    --color-gold:          #C4A65A;   /* 复古金 - 强调文字/装饰线 */
+    --color-gold-light:    #DCC88C;   /* 浅金色 - hover高亮 */
+
+    /* 文字色系 */
+    --color-text-primary:  #2C2C2C;   /* 主文字 - 深灰（阅读舒适） */
+    --color-text-secondary:#5C5C5C;   /* 次文字 - 辅助说明 */
+    --color-text-light:    #8C8C8C;   /* 弱文字 - 占位/注释 */
+    --color-text-on-dark:  #E8E0D0;   /* 深色底上文字 - 米黄 */
+
+    /* -------- 排版体系 -------- */
+    /* 字体栈：优先使用系统自带中文字体，保证离线可用 */
+    --font-body:      "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB",
+                      "Noto Sans SC", sans-serif;           /* 正文 - 无衬线 */
+    --font-heading:   "SimSong", "STSong", "Noto Serif SC",
+                      "Songti SC", "KaiTi", "STKaiti", serif; /* 标题 - 宋体/楷体 */
+    --font-display:   "KaiTi", "STKaiti", "SimKai",
+                      "Noto Serif SC", serif;               /* 展示大字 - 楷体为主 */
+
+    /* 字号层级（基于16px根字号） */
+    --fs-display:     2.8rem;   /* 首页大标题 */
+    --fs-h1:          2rem;     /* 一级标题 */
+    --fs-h2:          1.6rem;   /* 二级标题 */
+    --fs-h3:          1.25rem;  /* 三级标题 */
+    --fs-body:        1rem;     /* 正文 */
+    --fs-small:       0.875rem; /* 辅助文字 */
+    --fs-caption:     0.75rem;  /* 图注/脚注 */
+
+    /* -------- 间距体系（基于8px基准） -------- */
+    --space-xs:       0.25rem;  /* 4px */
+    --space-sm:       0.5rem;   /* 8px */
+    --space-md:       1rem;     /* 16px */
+    --space-lg:       1.5rem;   /* 24px */
+    --space-xl:       2rem;     /* 32px */
+    --space-2xl:      3rem;     /* 48px */
+    --space-3xl:      4rem;     /* 64px */
+    --space-4xl:      6rem;     /* 96px */
+
+    /* -------- 布局尺寸 -------- */
+    --max-width:      1200px;   /* 内容区最大宽度 */
+    --nav-height:     60px;     /* 导航栏高度 */
+
+    /* -------- 阴影体系 -------- */
+    /* 相框立体阴影：外投影 + 深色描边 + 内高光线 */
+    --shadow-frame:   4px 4px 12px rgba(26, 47, 68, 0.25),
+                      0 0 0 2px var(--color-wood-dark),
+                      inset 0 0 0 1px rgba(255,255,255,0.1);
+    /* 普通卡片阴影 */
+    --shadow-card:    0 2px 8px rgba(26, 47, 68, 0.1);
+    /* 卡片hover浮起阴影 */
+    --shadow-card-hover: 0 6px 20px rgba(26, 47, 68, 0.18);
+    /* 导航栏底部阴影 */
+    --shadow-nav:     0 2px 12px rgba(0, 0, 0, 0.2);
+
+    /* -------- 圆角 -------- */
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --radius-lg:      12px;
+
+    /* -------- 过渡动画 -------- */
+    --transition:     0.3s ease;
+}
+
+/* ============================================================
+ *  二、CSS 重置（Reset）
+ *  统一浏览器默认样式，消除差异
+ * ============================================================ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* 根元素：设置平滑滚动 */
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;                /* 基准字号 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Body 基础样式 */
+body {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.8;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+    min-height: 100vh;
+    /* 纸张纹理微妙的背景渐变，增强文博氛围 */
+    background-image:
+        linear-gradient(0deg, rgba(184, 162, 136, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184, 162, 136, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* 链接重置 */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* 图片重置 */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* 列表重置 */
+ul, ol {
+    list-style: none;
+}
+
+/* ============================================================
+ *  三、通用布局工具类
+ *  命名前缀：l- 表示布局（layout）
+ * ============================================================ */
+
+/* 内容容器：限定最大宽度并居中 */
+.l-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-left: var(--space-xl);
+    padding-right: var(--space-xl);
+}
+
+/* 通用区块 */
+.l-section {
+    padding: var(--space-3xl) 0;
+}
+
+/* ============================================================
+ *  四、顶部横幅（Museum Banner）
+ *  全屏高度，深藏青背景+图片叠加，居中展示标题
+ * ============================================================ */
+.museum-banner {
+    position: relative;
+    width: 100%;
+    min-height: 85vh;               /* 接近全屏高度 */
+    background-color: var(--color-navy-deep);
+    /* 默认渐变背景（图片加载失败时的保底） */
+    background-image:
+        linear-gradient(
+            135deg,
+            var(--color-navy-deep) 0%,
+            var(--color-navy-light) 50%,
+            var(--color-navy-dark) 100%
+        );
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* 横幅暗色遮罩层：增强文字可读性 */
+.museum-banner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 31, 46, 0.55); /* 半透明深色遮罩 */
+    z-index: 1;
+}
+
+/* 横幅文字内容区 */
+.museum-banner__content {
+    position: relative;
+    z-index: 2;                     /* 位于遮罩之上 */
+    text-align: center;
+    padding: var(--space-xl);
+    max-width: 800px;
+}
+
+/* 横幅主标题 */
+.museum-banner__title {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    color: var(--color-gold-light);
+    letter-spacing: 0.08em;         /* 字间距增强庄重感 */
+    line-height: 1.4;
+    margin-bottom: var(--space-lg);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* 横幅副标题 */
+.museum-banner__subtitle {
+    font-family: var(--font-heading);
+    font-size: var(--fs-h3);
+    color: var(--color-text-on-dark);
+    letter-spacing: 0.12em;
+    opacity: 0.85;
+}
+
+/* 横幅底部装饰线 */
+.museum-banner__decoration {
+    width: 80px;
+    height: 3px;
+    background: var(--color-gold);
+    margin: var(--space-lg) auto 0;
+    opacity: 0.7;
+}
+
+/* ============================================================
+ *  五、导航栏（Museum Navigation）
+ *  粘性定位，深藏青背景，金色高亮当前页
+ * ============================================================ */
+.museum-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;                   /* 确保始终在最上层 */
+    width: 100%;
+    height: var(--nav-height);
+    background: var(--color-navy-deep);
+    box-shadow: var(--shadow-nav);
+    /* 底部细金线装饰 */
+    border-bottom: 1px solid rgba(196, 166, 90, 0.2);
+}
+
+/* 导航内部容器：flex横向排列 */
+.museum-nav__list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    gap: var(--space-sm);
+}
+
+/* 导航链接项 */
+.museum-nav__item {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* 导航链接样式 */
+.museum-nav__link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 var(--space-xl);
+    font-family: var(--font-heading);
+    font-size: var(--fs-body);
+    color: var(--color-text-on-dark);
+    letter-spacing: 0.06em;
+    position: relative;
+    transition: color var(--transition), background var(--transition);
+    cursor: pointer;
+}
+
+/* 导航链接hover效果 */
+.museum-nav__link:hover {
+    color: var(--color-gold-light);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 导航链接 - 当前页激活态 */
+.museum-nav__link--active {
+    color: var(--color-gold) !important;
+}
+
+/* 激活态底部指示条 */
+.museum-nav__link--active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: var(--color-gold);
+    border-radius: 2px 2px 0 0;
+}
+
+/* 导航链接间的分隔符（竖线装饰） */
+.museum-nav__separator {
+    width: 1px;
+    height: 20px;
+    background: rgba(232, 224, 208, 0.2);
+    flex-shrink: 0;
+}
+
+/* ============================================================
+ *  六、主导航快捷入口（首页banner下方引导按钮）
+ * ============================================================ */
+.quick-entry {
+    display: flex;
+    gap: var(--space-xl);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--space-xl);
+}
+
+.quick-entry__btn {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-xl);
+    border: 1px solid var(--color-gold);
+    color: var(--color-gold-light);
+    font-family: var(--font-heading);
+    font-size: var(--fs-small);
+    letter-spacing: 0.1em;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+}
+
+.quick-entry__btn:hover {
+    background: var(--color-gold);
+    color: var(--color-navy-dark);
+}
+
+/* ============================================================
+ *  七、统一页脚（Museum Footer）
+ *  深色背景，版权及主办信息
+ * ============================================================ */
+.museum-footer {
+    background: var(--color-navy-dark);
+    color: var(--color-text-on-dark);
+    text-align: center;
+    padding: var(--space-2xl) var(--space-xl);
+    font-size: var(--fs-small);
+    line-height: 2;
+    letter-spacing: 0.04em;
+    border-top: 3px solid var(--color-gold);
+}
+
+/* 页脚装饰线 */
+.museum-footer__divider {
+    width: 60px;
+    height: 2px;
+    background: rgba(196, 166, 90, 0.4);
+    margin: 0 auto var(--space-md);
+}
+
+/* 页脚主办/技术支持行 */
+.museum-footer__meta {
+    color: rgba(232, 224, 208, 0.5);
+    font-size: var(--fs-caption);
+    margin-top: var(--space-sm);
+}
+
+/* ============================================================
+ *  八、响应式调整（桌面优先，辅以移动端降级）
+ * ============================================================ */
+
+/* 中等屏幕（平板） */
+@media (max-width: 1024px) {
+    :root {
+        --fs-display: 2rem;
+        --fs-h1:      1.6rem;
+        --fs-h2:      1.35rem;
+        --space-3xl:  2.5rem;
+        --space-4xl:  4rem;
+    }
+
+    .museum-banner {
+        min-height: 60vh;
+    }
+
+    .museum-nav__link {
+        padding: 0 var(--space-md);
+        font-size: var(--fs-small);
+    }
+}
+
+/* 小屏幕（手机） */
+@media (max-width: 768px) {
+    :root {
+        --fs-display: 1.6rem;
+        --fs-h1:      1.35rem;
+        --fs-h2:      1.15rem;
+        --space-3xl:  2rem;
+        --space-xl:   1rem;
+    }
+
+    .museum-banner {
+        min-height: 45vh;
+    }
+
+    .museum-banner__title {
+        letter-spacing: 0.04em;
+    }
+
+    /* 导航改为纵向排列 */
+    .museum-nav {
+        height: auto;
+        min-height: var(--nav-height);
+    }
+
+    .museum-nav__list {
+        flex-direction: column;
+        padding: var(--space-sm) 0;
+    }
+
+    .museum-nav__link {
+        height: 44px;
+        padding: 0 var(--space-lg);
+    }
+
+    .museum-nav__separator {
+        display: none;              /* 小屏隐藏分隔符 */
+    }
+
+    .museum-nav__link--active::after {
+        width: 40%;
+    }
+
+    .museum-footer {
+        padding: var(--space-xl);
+    }
+}
+
+/* 超小屏幕 */
+@media (max-width: 480px) {
+    .museum-banner {
+        min-height: 40vh;
+    }
+
+    .l-container {
+        padding-left: var(--space-md);
+        padding-right: var(--space-md);
+    }
+}

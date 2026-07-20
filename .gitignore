@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Temp files
+*.tmp
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Work files (not part of museum)
+.work/
+
+# Serveo/SSH known hosts
+*.pub
+known_hosts

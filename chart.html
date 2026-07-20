@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<!--
+  深圳改革开放交通发展数字博物馆 - 全国数据页
+  文件：chart.html
+  内容：1978-2025年全国高速公路/高铁通车里程双折线图
+  数据来源：中华人民共和国交通运输部官网公开数据
+  技术：ECharts 5.5 CDN，博物馆配色主题
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="全国交通发展数据可视化 - 1978-2025高速/高铁通车里程">
+    <meta name="keywords" content="交通数据,高速公路,高铁,数据可视化,深圳,改革开放">
+    <title>深圳交通数字博物馆 - 全国数据</title>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+    <!-- ============================================================
+         一、顶部横幅
+         ============================================================ -->
+    <header class="museum-banner"
+            style="background-image: url('img/banner.jpeg'); min-height: 50vh;"
+            role="banner">
+        <div class="museum-banner__content">
+            <h1 class="museum-banner__title">全国交通发展数据</h1>
+            <p class="museum-banner__subtitle">
+                1978 - 2025  ·  数据见证时代变迁  ·  数字记录发展足迹
+            </p>
+            <div class="museum-banner__decoration"></div>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         二、主导航栏
+         ============================================================ -->
+    <nav class="museum-nav" role="navigation" aria-label="主导航">
+        <ul class="museum-nav__list">
+            <li class="museum-nav__item">
+                <a href="index.html" class="museum-nav__link">首页展厅</a>
+            </li>
+            <li class="museum-nav__separator" aria-hidden="true"></li>
+            <li class="museum-nav__item">
+                <a href="chart.html" class="museum-nav__link">全国数据</a>
+            </li>
+            <li class="museum-nav__separator" aria-hidden="true"></li>
+            <li class="museum-nav__item">
+                <a href="map.html" class="museum-nav__link">地图沙盘</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ============================================================
+         三、主内容区
+         ============================================================ -->
+    <main role="main">
+
+        <!-- ------- 模块一：数据概览 ------- -->
+        <section class="exhibit-module" id="overview" aria-labelledby="overview-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="overview-title">数据概览</h2>
+                    <p class="exhibit-module__subtitle">
+                        改革开放以来，中国交通运输事业取得举世瞩目的成就
+                    </p>
+                </div>
+                <p class="exhibit-module__text">
+                    自1978年改革开放以来，中国交通运输事业经历了从严重滞后到世界领先的
+                    历史性跨越。1988年中国大陆第一条高速公路——沪嘉高速公路建成通车，
+                    开启了中国高速公路时代；2008年京津城际铁路开通运营，
+                    标志着中国正式迈入高铁时代。以下折线图以交通运输部公开数据为基础，
+                    直观呈现1978年至2025年全国高速公路与高速铁路通车里程的增长轨迹。
+                </p>
+            </div>
+        </section>
+
+        <!-- ------- 模块二：高速公路通车里程折线图 ------- -->
+        <section class="exhibit-module" id="chart-highway-section" aria-labelledby="chart-highway-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="chart-highway-title">
+                        全国高速公路通车里程（1978-2025）
+                    </h2>
+                    <p class="exhibit-module__subtitle">
+                        从零到世界第一 · 中国高速公路建设四十年
+                    </p>
+                </div>
+                <!-- ECharts 图表容器 1：高速公路 -->
+                <div id="chart-highway"
+                     class="chart-box anim-fade-up"
+                     style="max-width: var(--max-width); margin: 0 auto; height: 500px;">
+                </div>
+                <!-- 图表说明 -->
+                <p class="u-text-center u-mt-md"
+                   style="font-size: var(--fs-caption); color: var(--color-text-light); max-width: 800px; margin-left: auto; margin-right: auto;">
+                    ▲ 1988年沪嘉高速通车，实现"零的突破"；1999年突破1万公里；
+                    2013年突破10万公里，总里程跃居世界第一；截至2025年已超19万公里
+                </p>
+            </div>
+        </section>
+
+        <!-- ------- 模块三：高铁通车里程折线图 ------- -->
+        <section class="exhibit-module" id="chart-rail-section" aria-labelledby="chart-rail-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="chart-rail-title">
+                        全国高速铁路通车里程（2003-2025）
+                    </h2>
+                    <p class="exhibit-module__subtitle">
+                        从追赶到领跑 · 中国高铁发展二十年
+                    </p>
+                </div>
+                <!-- ECharts 图表容器 2：高铁 -->
+                <div id="chart-rail"
+                     class="chart-box anim-fade-up"
+                     style="max-width: var(--max-width); margin: 0 auto; height: 500px;">
+                </div>
+                <p class="u-text-center u-mt-md"
+                   style="font-size: var(--fs-caption); color: var(--color-text-light); max-width: 800px; margin-left: auto; margin-right: auto;">
+                    ▲ 2003年秦沈客运专线建成（时速200km/h），为中国高铁序幕；
+                    2008年京津城际（时速350km/h）标志高铁时代到来；2025年"八纵八横"主通道基本建成
+                </p>
+            </div>
+        </section>
+
+        <!-- ------- 模块四：关键指标数据卡片 ------- -->
+        <section class="exhibit-module" id="data-cards" aria-labelledby="cards-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="cards-title">关键指标</h2>
+                    <p class="exhibit-module__subtitle">
+                        2025年全国交通运输核心数据概览（据交通运输部统计公报）
+                    </p>
+                </div>
+                <div class="exhibit-grid">
+                    <!-- 指标1 -->
+                    <div class="data-card anim-fade-up anim-delay-1">
+                        <div class="data-card__value">
+                            19.2<span class="data-card__unit">万</span>
+                        </div>
+                        <div class="data-card__label">🛣️ 全国高速公路通车里程（公里）</div>
+                    </div>
+                    <!-- 指标2 -->
+                    <div class="data-card anim-fade-up anim-delay-2">
+                        <div class="data-card__value">
+                            5.0<span class="data-card__unit">万</span>
+                        </div>
+                        <div class="data-card__label">🚄 全国高铁运营里程（公里）</div>
+                    </div>
+                    <!-- 指标3 -->
+                    <div class="data-card anim-fade-up anim-delay-3">
+                        <div class="data-card__value">
+                            543<span class="data-card__unit">万</span>
+                        </div>
+                        <div class="data-card__label">🛤️ 全国公路总里程（公里）</div>
+                    </div>
+                    <!-- 指标4 -->
+                    <div class="data-card anim-fade-up anim-delay-4">
+                        <div class="data-card__value">
+                            15.9<span class="data-card__unit">万</span>
+                        </div>
+                        <div class="data-card__label">🚃 全国铁路营业里程（公里）</div>
+                    </div>
+                </div>
+                <!-- 素材来源标注 -->
+                <div class="source-citation anim-fade-up">
+                    <p class="source-citation__title">📊 数据来源</p>
+                    <div class="source-citation__list">
+                        <span class="source-citation__item">
+                            🏛️ 中华人民共和国交通运输部官网
+                        </span>
+                        <span class="source-citation__item">
+                            📋 历年《交通运输行业发展统计公报》
+                        </span>
+                        <span class="source-citation__item">
+                            📚 国家统计局《中国统计年鉴》
+                        </span>
+                    </div>
+                    <p style="margin-top: var(--space-sm); font-size: var(--fs-caption); color: var(--color-text-light);">
+                        * 2024-2025年部分数据为基于规划目标的预测值，最终以官方公报为准
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+         四、统一页脚
+         ============================================================ -->
+    <footer class="museum-footer" role="contentinfo">
+        <div class="museum-footer__divider"></div>
+        <p>© 2026 深圳改革开放交通发展数字博物馆 版权所有</p>
+        <p class="museum-footer__meta">
+            本馆为数字展览项目 &nbsp;|&nbsp; 数据来源：中华人民共和国交通运输部官网
+        </p>
+    </footer>
+
+    <!-- ===== ECharts CDN ===== -->
+    <!--
+        从 jsDelivr CDN 引入 ECharts 5.5
+        备用CDN：https://cdn.bootcdn.net/ajax/libs/echarts/5.5.0/echarts.min.js
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <!-- ===== 导航高亮 ===== -->
+    <script src="js/nav.js"></script>
+
+    <!-- ===== ECharts 图表渲染（内联脚本） ===== -->
+    <script>
+    /**
+     * ============================================================
+     *  全国交通数据图表渲染
+     *  数据来源：中华人民共和国交通运输部官网历年统计公报
+     *  图表类型：双折线图（高速公路 + 高速铁路通车里程）
+     *  配色方案：博物馆藏青文博风格
+     * ============================================================
+     */
+    (function () {
+        'use strict';
+
+        // ---- 等待DOM和ECharts就绪 ----
+        function ready(fn) {
+            if (document.readyState !== 'loading') {
+                fn();
+            } else {
+                document.addEventListener('DOMContentLoaded', fn);
+            }
+        }
+
+        ready(function () {
+            // 检查ECharts是否加载
+            if (typeof echarts === 'undefined') {
+                console.warn('[博物馆·数据页] ECharts未加载，图表渲染取消');
+                return;
+            }
+
+            // ============================================================
+            //  图表一：全国高速公路通车里程（1978-2025）
+            //  单位：万公里
+            //  关键节点：1988年首条高速通车 → 1999年突破1万km →
+            //            2013年突破10万km跃居世界第一 → 2025年超19万km
+            // ============================================================
+            (function () {
+                var container = document.getElementById('chart-highway');
+                if (!container) return;
+
+                var chart = echarts.init(container);
+
+                // ---- X轴：年份 ----
+                var years = [];
+                for (var y = 1978; y <= 2025; y++) {
+                    years.push(String(y));
+                }
+
+                // ---- Y轴数据：高速公路通车里程（万公里） ----
+                var highwayData = [
+                    // 1978-1987: 无高速公路
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    // 1988: 沪嘉高速通车（约147km → 0.01万km）
+                    0.01,
+                    // 1989
+                    0.03,
+                    // 1990-1994
+                    0.05, 0.06, 0.07, 0.11, 0.16,
+                    // 1995-1999
+                    0.21, 0.34, 0.48, 0.87, 1.16,
+                    // 2000-2004
+                    1.63, 1.94, 2.51, 2.97, 3.43,
+                    // 2005-2009
+                    4.10, 4.53, 5.39, 6.03, 6.51,
+                    // 2010-2014
+                    7.41, 8.49, 9.62, 10.44, 11.19,
+                    // 2015-2019
+                    12.35, 13.10, 13.65, 14.26, 14.96,
+                    // 2020-2024
+                    16.10, 16.91, 17.73, 18.36, 18.80,
+                    // 2025（规划预测值）
+                    19.20
+                ];
+
+                // ---- 博物馆文博风格配色 ----
+                var highwayColor = '#C4A65A';     // 复古金
+                var highwayAreaColor = 'rgba(196, 166, 90, 0.15)';
+
+                var option = {
+                    // 背景透明，继承页面米白色
+                    backgroundColor: 'transparent',
+
+                    // 图表内边距
+                    grid: {
+                        left: '8%',
+                        right: '8%',
+                        top: '12%',
+                        bottom: '10%',
+                        containLabel: true
+                    },
+
+                    // 提示框
+                    tooltip: {
+                        trigger: 'axis',
+                        backgroundColor: 'rgba(26, 47, 68, 0.92)',
+                        borderColor: '#C4A65A',
+                        borderWidth: 1,
+                        textStyle: {
+                            color: '#E8E0D0',
+                            fontSize: 13,
+                            fontFamily: '"Microsoft YaHei", sans-serif'
+                        },
+                        formatter: function (params) {
+                            var p = params[0];
+                            var val = p.value;
+                            var suffix = val === 0 ? '（尚未建设）'
+                                       : val < 1 ? '公里' : '万公里';
+                            var display = val < 1 && val > 0
+                                       ? (val * 10000).toFixed(0)
+                                       : val.toFixed(2);
+                            return '<strong>' + p.axisValue + '年</strong><br/>'
+                                 + '<span style="display:inline-block;width:10px;height:10px;'
+                                 + 'border-radius:50%;background:' + highwayColor
+                                 + ';margin-right:6px;"></span>'
+                                 + '高速公路通车里程：<b>' + display + '</b> ' + suffix;
+                        }
+                    },
+
+                    // 图例
+                    legend: {
+                        data: ['高速公路通车里程'],
+                        top: '2%',
+                        textStyle: {
+                            color: '#5C5C5C',
+                            fontSize: 13,
+                            fontFamily: '"KaiTi", "STKaiti", serif'
+                        }
+                    },
+
+                    // X轴
+                    xAxis: {
+                        type: 'category',
+                        data: years,
+                        boundaryGap: false,
+                        axisLine: {
+                            lineStyle: { color: '#9A8268' }   // 深原木色轴线
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        axisLabel: {
+                            color: '#5C5C5C',
+                            fontSize: 11,
+                            fontFamily: '"Microsoft YaHei", sans-serif',
+                            // 每5年显示一个标签，避免拥挤
+                            interval: function (index, value) {
+                                var y = parseInt(value);
+                                return (y % 5 === 0 || y === 1978 || y === 2025) ? 0 : 'auto';
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    },
+
+                    // Y轴
+                    yAxis: {
+                        type: 'value',
+                        name: '万公里',
+                        nameTextStyle: {
+                            color: '#8C8C8C',
+                            fontSize: 12,
+                            fontFamily: '"KaiTi", serif'
+                        },
+                        axisLabel: {
+                            color: '#8C8C8C',
+                            fontSize: 11,
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: 'rgba(184, 162, 136, 0.2)',
+                                type: 'dashed'
+                            }
+                        }
+                    },
+
+                    // 数据系列
+                    series: [{
+                        name: '高速公路通车里程',
+                        type: 'line',
+                        data: highwayData,
+                        smooth: true,               // 平滑曲线
+                        symbol: 'circle',
+                        symbolSize: function (value) {
+                            // 关键节点用大圆点标记
+                            return (value === 0) ? 0 : 6;
+                        },
+                        lineStyle: {
+                            color: highwayColor,
+                            width: 3
+                        },
+                        itemStyle: {
+                            color: highwayColor,
+                            borderColor: '#FFFDF8',
+                            borderWidth: 2
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0,   color: 'rgba(196, 166, 90, 0.3)' },
+                                { offset: 0.6, color: 'rgba(196, 166, 90, 0.08)' },
+                                { offset: 1,   color: 'rgba(196, 166, 90, 0.01)' }
+                            ])
+                        },
+                        // 标注关键节点
+                        markPoints: {
+                            data: [
+                                {
+                                    name: '首条高速通车',
+                                    coord: ['1988', 0.01],
+                                    value: '1988首条高速',
+                                    symbol: 'pin',
+                                    symbolSize: 40,
+                                    itemStyle: { color: '#1A2F44' },
+                                    label: {
+                                        show: true,
+                                        formatter: '1988\n首条高速通车',
+                                        color: '#1A2F44',
+                                        fontSize: 11,
+                                        fontFamily: '"KaiTi", serif'
+                                    }
+                                },
+                                {
+                                    name: '跃居世界第一',
+                                    coord: ['2013', 10.44],
+                                    value: '2013世界第一',
+                                    symbol: 'pin',
+                                    symbolSize: 40,
+                                    itemStyle: { color: '#C4A65A' },
+                                    label: {
+                                        show: true,
+                                        formatter: '2013\n跃居世界第一',
+                                        color: '#C4A65A',
+                                        fontSize: 11,
+                                        fontFamily: '"KaiTi", serif'
+                                    }
+                                }
+                            ]
+                        }
+                    }]
+                };
+
+                chart.setOption(option);
+
+                // ---- 响应式resize ----
+                window.addEventListener('resize', function () {
+                    chart.resize();
+                });
+
+                // 暴露实例到全局便于调试
+                window._museumHighwayChart = chart;
+            })();
+
+            // ============================================================
+            //  图表二：全国高速铁路通车里程（2003-2025）
+            //  单位：万公里
+            //  关键节点：2003秦沈客运专线→2008京津城际→2025"八纵八横"基本建成
+            // ============================================================
+            (function () {
+                var container = document.getElementById('chart-rail');
+                if (!container) return;
+
+                var chart = echarts.init(container);
+
+                // ---- X轴：2003-2025（高铁时代） ----
+                var railYears = [];
+                for (var y = 2003; y <= 2025; y++) {
+                    railYears.push(String(y));
+                }
+
+                // ---- Y轴数据：高铁通车里程（万公里） ----
+                var railData = [
+                    // 2003: 秦沈客运专线（404km，时速200km/h，通常视为中国高铁起点）
+                    0.04,
+                    // 2004-2007: 仅秦沈线（京津城际在建）
+                    0.04, 0.04, 0.04, 0.04,
+                    // 2008: 京津城际开通（时速350km/h）+ 合宁、胶济等
+                    0.07,
+                    // 2009: 武广、郑西、甬台温等开通
+                    0.35,
+                    // 2010: 郑西、福厦、沪宁等
+                    0.51,
+                    // 2011: 京沪高铁开通
+                    0.66,
+                    // 2012: 哈大、京广全线贯通
+                    0.93,
+                    // 2013
+                    1.10,
+                    // 2014: 兰新、贵广、南广等
+                    1.60,
+                    // 2015
+                    1.90,
+                    // 2016
+                    2.20,
+                    // 2017: "四纵四横"基本建成
+                    2.50,
+                    // 2018
+                    2.90,
+                    // 2019
+                    3.50,
+                    // 2020
+                    3.79,
+                    // 2021
+                    4.00,
+                    // 2022
+                    4.20,
+                    // 2023
+                    4.50,
+                    // 2024（预测）
+                    4.80,
+                    // 2025（预测："八纵八横"主通道基本建成）
+                    5.00
+                ];
+
+                // ---- 高铁配色 ----
+                var railColor = '#2C4A6B';       // 浅藏青
+                var railAreaColor = 'rgba(44, 74, 107, 0.12)';
+
+                var option = {
+                    backgroundColor: 'transparent',
+
+                    grid: {
+                        left: '8%',
+                        right: '8%',
+                        top: '12%',
+                        bottom: '10%',
+                        containLabel: true
+                    },
+
+                    tooltip: {
+                        trigger: 'axis',
+                        backgroundColor: 'rgba(26, 47, 68, 0.92)',
+                        borderColor: '#C4A65A',
+                        borderWidth: 1,
+                        textStyle: {
+                            color: '#E8E0D0',
+                            fontSize: 13,
+                            fontFamily: '"Microsoft YaHei", sans-serif'
+                        },
+                        formatter: function (params) {
+                            var p = params[0];
+                            var val = p.value;
+                            return '<strong>' + p.axisValue + '年</strong><br/>'
+                                 + '<span style="display:inline-block;width:10px;height:10px;'
+                                 + 'border-radius:50%;background:' + railColor
+                                 + ';margin-right:6px;"></span>'
+                                 + '高铁通车里程：<b>' + val.toFixed(2) + '</b> 万公里'
+                                 + '（约' + (val * 10000).toFixed(0) + '公里）';
+                        }
+                    },
+
+                    legend: {
+                        data: ['高速铁路通车里程'],
+                        top: '2%',
+                        textStyle: {
+                            color: '#5C5C5C',
+                            fontSize: 13,
+                            fontFamily: '"KaiTi", "STKaiti", serif'
+                        }
+                    },
+
+                    xAxis: {
+                        type: 'category',
+                        data: railYears,
+                        boundaryGap: false,
+                        axisLine: {
+                            lineStyle: { color: '#9A8268' }
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        axisLabel: {
+                            color: '#5C5C5C',
+                            fontSize: 11,
+                            fontFamily: '"Microsoft YaHei", sans-serif',
+                            interval: function (index, value) {
+                                var y = parseInt(value);
+                                return (y % 2 === 0 || y === 2003 || y === 2025) ? 0 : 'auto';
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    },
+
+                    yAxis: {
+                        type: 'value',
+                        name: '万公里',
+                        nameTextStyle: {
+                            color: '#8C8C8C',
+                            fontSize: 12,
+                            fontFamily: '"KaiTi", serif'
+                        },
+                        axisLabel: {
+                            color: '#8C8C8C',
+                            fontSize: 11,
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: 'rgba(184, 162, 136, 0.2)',
+                                type: 'dashed'
+                            }
+                        }
+                    },
+
+                    series: [{
+                        name: '高速铁路通车里程',
+                        type: 'line',
+                        data: railData,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        lineStyle: {
+                            color: railColor,
+                            width: 3
+                        },
+                        itemStyle: {
+                            color: railColor,
+                            borderColor: '#FFFDF8',
+                            borderWidth: 2
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0,   color: 'rgba(44, 74, 107, 0.25)' },
+                                { offset: 0.6, color: 'rgba(44, 74, 107, 0.06)' },
+                                { offset: 1,   color: 'rgba(44, 74, 107, 0.01)' }
+                            ])
+                        },
+                        markPoints: {
+                            data: [
+                                {
+                                    name: '高铁起点',
+                                    coord: ['2008', 0.07],
+                                    value: '2008高铁元年',
+                                    symbol: 'pin',
+                                    symbolSize: 40,
+                                    itemStyle: { color: '#1A2F44' },
+                                    label: {
+                                        show: true,
+                                        formatter: '2008\n高铁元年',
+                                        color: '#1A2F44',
+                                        fontSize: 11,
+                                        fontFamily: '"KaiTi", serif',
+                                        offset: [0, -8]
+                                    }
+                                },
+                                {
+                                    name: '世界第一',
+                                    coord: ['2020', 3.79],
+                                    value: '2020世界第一',
+                                    symbol: 'pin',
+                                    symbolSize: 40,
+                                    itemStyle: { color: '#C4A65A' },
+                                    label: {
+                                        show: true,
+                                        formatter: '2020\n高铁里程\n世界第一',
+                                        color: '#C4A65A',
+                                        fontSize: 11,
+                                        fontFamily: '"KaiTi", serif'
+                                    }
+                                }
+                            ]
+                        }
+                    }]
+                };
+
+                chart.setOption(option);
+
+                // ---- 响应式resize ----
+                window.addEventListener('resize', function () {
+                    chart.resize();
+                });
+
+                window._museumRailChart = chart;
+            })();
+
+        }); // end ready()
+
+    })();
+    </script>
+
+    <!-- ===== 全局交互（滚动动画等） ===== -->
+    <script src="js/main.js"></script>
+
+</body>
+</html>

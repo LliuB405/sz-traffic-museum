@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<!--
+  深圳改革开放交通发展数字博物馆 - 地图沙盘页
+  文件：map.html
+  功能：双层沙盘布局
+        上层 → 全国高速热力地图（ECharts，省份悬浮显示里程）
+        下层 → 深圳交通交互沙盘（本地底图 + 5条道路可点击 + 信息面板）
+  底图：img/shenzhen_traffic_map.jpg
+  数据来源：中华人民共和国交通运输部官网
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="深圳交通地图沙盘 - 全国热力图 + 深圳交互沙盘">
+    <title>深圳交通数字博物馆 - 地图沙盘</title>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+    <!-- ============================================================
+         一、顶部横幅
+         ============================================================ -->
+    <header class="museum-banner"
+            style="background-image: url('img/banner.jpeg'); min-height: 50vh;"
+            role="banner">
+        <div class="museum-banner__content">
+            <h1 class="museum-banner__title">深圳交通地图沙盘</h1>
+            <p class="museum-banner__subtitle">
+                双层沙盘 · 一图纵览全国格局 · 指尖触摸鹏城脉络
+            </p>
+            <div class="museum-banner__decoration"></div>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         二、主导航栏（三页统一）
+         ============================================================ -->
+    <nav class="museum-nav" role="navigation" aria-label="主导航">
+        <ul class="museum-nav__list">
+            <li class="museum-nav__item">
+                <a href="index.html" class="museum-nav__link">首页展厅</a>
+            </li>
+            <li class="museum-nav__separator" aria-hidden="true"></li>
+            <li class="museum-nav__item">
+                <a href="chart.html" class="museum-nav__link">全国数据</a>
+            </li>
+            <li class="museum-nav__separator" aria-hidden="true"></li>
+            <li class="museum-nav__item">
+                <a href="map.html" class="museum-nav__link">地图沙盘</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ============================================================
+         三、主内容区
+         ============================================================ -->
+    <main role="main">
+
+        <!-- ====== 模块一：沙盘导览说明 ====== -->
+        <section class="exhibit-module" id="map-intro" aria-labelledby="map-intro-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="map-intro-title">沙盘导览</h2>
+                    <p class="exhibit-module__subtitle">
+                        上层 · 全国高速热力图 &nbsp;|&nbsp; 下层 · 深圳交通交互沙盘
+                    </p>
+                </div>
+                <p class="exhibit-module__text">
+                    本页采用双层沙盘布局：上层以ECharts全国热力图展示各省高速公路通车里程分布，
+                    鼠标悬浮省份即可查看详细数据，直观感受中国高速公路从"零的突破"到
+                    "世界第一"的空间格局。下层为深圳交通交互沙盘，加载本地交通底图，
+                    预设5条具有历史意义的道路/轨道线路，点击地图上的金色热点即可查看详细介绍。
+                </p>
+            </div>
+        </section>
+
+        <!-- ====== 模块二：上层 — 全国高速热力地图 ====== -->
+        <section class="exhibit-module" id="heatmap-section" aria-labelledby="heatmap-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="heatmap-title">
+                        全国高速公路通车里程热力图
+                    </h2>
+                    <p class="exhibit-module__subtitle">
+                        鼠标悬浮各省份查看高速通车里程 ｜ 数据来源：交通运输部
+                    </p>
+                </div>
+
+                <!-- 原木相框包裹热力图 -->
+                <div class="sandbox-frame anim-fade-up"
+                     style="max-width: var(--max-width); margin: 0 auto;">
+                    <!-- ECharts 中国地图热力图容器 -->
+                    <div id="chart-heatmap" class="heatmap-box">
+                        <!-- 加载中占位提示（GeoJSON加载完成后移除） -->
+                        <div class="heatmap-box__loading" id="heatmap-loading">
+                            📡 正在加载中国地图数据...
+                        </div>
+                    </div>
+                    <span class="sandbox-frame__plaque">
+                        中国高速公路热力分布 · 2025
+                    </span>
+                </div>
+
+                <!-- 热力图图例说明 -->
+                <div class="source-citation anim-fade-up" style="max-width: 800px;">
+                    <p class="source-citation__title">📊 数据说明</p>
+                    <div class="source-citation__list">
+                        <span class="source-citation__item">🏛️ 数据来源：交通运输部历年统计公报</span>
+                        <span class="source-citation__item">🗺️ 地图底图：DataV.GeoAtlas</span>
+                    </div>
+                    <p style="margin-top: var(--space-sm); font-size: var(--fs-caption); color: var(--color-text-light);">
+                        * 颜色越深代表该省份高速公路通车里程越高 · 鼠标悬浮查看具体数值
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== 模块三：下层 — 深圳交通分区交互沙盘 ====== -->
+        <section class="exhibit-module" id="sandbox-section" aria-labelledby="sandbox-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="sandbox-title">
+                        深圳交通分区交互沙盘
+                    </h2>
+                    <p class="exhibit-module__subtitle">
+                        选择行政区放大查看 · 点击公路或轨道线路，在地图下方阅读交通史
+                    </p>
+                </div>
+
+                <div class="district-switcher" id="district-switcher" role="toolbar" aria-label="深圳行政区地图切换">
+                    <button class="district-switcher__btn" type="button" data-district="city">全市概览</button>
+                    <button class="district-switcher__btn is-active" type="button" data-district="baoan">宝安区</button>
+                    <button class="district-switcher__btn" type="button" data-district="guangming">光明区</button>
+                    <button class="district-switcher__btn" type="button" data-district="longhua">龙华区</button>
+                    <button class="district-switcher__btn" type="button" data-district="longgang">龙岗区</button>
+                    <button class="district-switcher__btn" type="button" data-district="pingshan">坪山区</button>
+                    <button class="district-switcher__btn" type="button" data-district="dapeng">大鹏新区</button>
+                    <button class="district-switcher__btn" type="button" data-district="nanshan">南山区</button>
+                    <button class="district-switcher__btn" type="button" data-district="futian">福田区</button>
+                    <button class="district-switcher__btn" type="button" data-district="luohu">罗湖区</button>
+                    <button class="district-switcher__btn" type="button" data-district="yantian">盐田区</button>
+                </div>
+
+                <!-- 原木相框 + 原始比例底图 + 同坐标系线路层 -->
+                <div class="sandbox-frame anim-fade-up"
+                     style="max-width: var(--max-width); margin: 0 auto;">
+                    <div id="sandbox-map"
+                         class="sandbox-map"
+                         aria-label="深圳分区交通沙盘——选择行政区并点击彩色线路查看详情">
+                        <div class="sandbox-stage" id="sandbox-stage">
+                            <img class="sandbox-base-map" src="img/shenzhen_traffic_map.jpg" alt="深圳市行政区划与主要道路底图">
+                            <svg class="sandbox-overlay" viewBox="0 0 1880 1340" aria-label="深圳公路与地铁线路标注">
+                                <defs>
+                                    <!--
+                                      从同一张底图实时生成陆地区域遮罩：纯白背景变为透明，
+                                      彩色行政区保持可见。线路因此不会画到市外留白或海面上。
+                                    -->
+                                    <filter id="shenzhen-land-filter" x="0" y="0" width="100%" height="100%"
+                                            color-interpolation-filters="sRGB">
+                                        <feColorMatrix type="matrix" values="
+                                            0 0 0 0 0
+                                            0 0 0 0 0
+                                            0 0 0 0 0
+                                           -2 -2 -2 0 5.82" />
+                                    </filter>
+                                    <mask id="shenzhen-land-mask" maskUnits="userSpaceOnUse" style="mask-type: alpha;"
+                                          x="0" y="0" width="1880" height="1340">
+                                        <rect x="0" y="0" width="1880" height="1340" fill="black" />
+                                        <image href="img/shenzhen_traffic_map.jpg"
+                                               x="0" y="0" width="1880" height="1340"
+                                               filter="url(#shenzhen-land-filter)" />
+                                    </mask>
+                                </defs>
+                                <!-- 公路：使用底图原始像素坐标，不再与底图比例脱节 -->
+                                <g class="sandbox-route-group" data-districts="baoan,guangming,longhua,nanshan">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="guangshen" points="305,260 320,410 340,570 355,720 390,860" />
+                                    <text class="sandbox-label" x="340" y="625">广深高速</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="baoan,guangming,nanshan">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="g107" points="355,270 370,430 395,590 430,740 500,885" />
+                                    <text class="sandbox-label" x="405" y="560">G107国道</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="longgang,luohu">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="g205" points="1130,350 1080,480 1010,610 935,755 915,885" />
+                                    <text class="sandbox-label" x="1015" y="625">G205国道</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="nanshan,futian,luohu">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="shennan" points="505,880 620,865 735,862 830,868 945,880" />
+                                    <text class="sandbox-label" x="735" y="845">深南大道</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="nanshan,futian,luohu">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="beihuan" points="500,825 620,805 760,795 900,815" />
+                                    <text class="sandbox-label" x="700" y="780">北环大道</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="baoan,longhua,longgang">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="jiahe" points="255,705 430,685 615,690 805,700 1050,680" />
+                                    <text class="sandbox-label" x="640" y="675">机荷高速</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="nanshan,longhua,longgang,pingshan">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="nanping" points="520,765 690,735 855,720 1060,705 1250,690" />
+                                    <text class="sandbox-label" x="890" y="700">南坪快速</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="baoan,nanshan">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="yanjiang" points="170,390 165,520 190,680 245,825 315,915" />
+                                    <text class="sandbox-label" x="205" y="680">沿江高速</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="nanshan,futian,luohu">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="binhe" points="530,935 650,925 785,925 930,915" />
+                                    <text class="sandbox-label" x="730" y="955">滨海·滨河大道</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="futian,longhua">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="meiguan" points="770,855 750,730 725,590 705,475" />
+                                    <text class="sandbox-label" x="735" y="655">梅观高速</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="baoan,guangming,longhua,longgang,pingshan">
+                                    <!-- 分段绘制，避免跨越底图留白仍被强行连成直线 -->
+                                    <path class="sandbox-line sandbox-line--road js-sandbox-route" data-road="waihuan" d="M245 420 L355 398 L465 402 L555 425 M620 445 L700 455 L770 475 M910 500 L1030 480 L1170 495" />
+                                    <text class="sandbox-label" x="700" y="435">外环高速</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="luohu,yantian,dapeng">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="yanba" points="930,820 1080,805 1210,785 1370,750 1510,770" />
+                                    <text class="sandbox-label" x="1260" y="765">惠深沿海高速</text>
+                                </g>
+                                <g class="sandbox-route-group" data-districts="dapeng">
+                                    <polyline class="sandbox-line sandbox-line--road js-sandbox-route" data-road="pengfei" points="1410,760 1480,790 1540,835 1600,900 1665,980" />
+                                    <text class="sandbox-label" x="1570" y="875">坪西路·鹏飞路</text>
+                                </g>
+
+                                <!-- 轨道：按主要换乘节点校准的线路走向 -->
+                                <g class="sandbox-route-group" data-districts="baoan,nanshan,futian,luohu"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line1" points="245,755 360,850 470,895 575,890 655,870 755,875 940,880" /><text class="sandbox-label" x="610" y="885">1号线</text></g>
+                                <g class="sandbox-route-group" data-districts="nanshan,futian,luohu,yantian"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line2" points="420,1020 500,970 570,920 650,875 760,880 920,875 1080,835 1270,820" /><text class="sandbox-label" x="1080" y="815">2/8号线</text></g>
+                                <g class="sandbox-route-group" data-districts="futian,luohu,longgang"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line3" points="720,920 785,865 850,730 970,665 1090,625 1170,600" /><text class="sandbox-label" x="1000" y="645">3号线</text></g>
+                                <g class="sandbox-route-group" data-districts="futian,longhua"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line4" points="780,965 770,865 710,720 690,590 735,480" /><text class="sandbox-label" x="700" y="650">4号线</text></g>
+                                <g class="sandbox-route-group" data-districts="nanshan,baoan,longhua,longgang,luohu"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line5" points="420,1020 450,900 365,850 590,800 710,720 845,705 940,850" /><text class="sandbox-label" x="710" y="700">5号线</text></g>
+                                <g class="sandbox-route-group" data-districts="futian,longhua,guangming,baoan"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line6" points="820,885 710,720 610,610 475,500 360,450 275,420" /><text class="sandbox-label" x="500" y="520">6号线</text></g>
+                                <g class="sandbox-route-group" data-districts="nanshan,futian,luohu"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line7" points="585,805 690,875 820,870 925,805" /><text class="sandbox-label" x="800" y="850">7号线</text></g>
+                                <g class="sandbox-route-group" data-districts="nanshan,futian,luohu"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line9" points="465,925 590,910 700,880 790,810 955,875" /><text class="sandbox-label" x="785" y="825">9号线</text></g>
+                                <g class="sandbox-route-group" data-districts="futian,longhua,longgang"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line10" points="785,965 790,870 760,735 785,650 850,585" /><text class="sandbox-label" x="790" y="690">10号线</text></g>
+                                <g class="sandbox-route-group" data-districts="baoan,nanshan,futian"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line11" points="250,350 250,720 360,850 480,900 590,910 705,880 820,900" /><text class="sandbox-label" x="390" y="830">11号线</text></g>
+                                <g class="sandbox-route-group" data-districts="baoan,nanshan"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line12" points="275,420 245,755 360,860 500,925 420,1020" /><text class="sandbox-label" x="330" y="780">12号线</text></g>
+                                <g class="sandbox-route-group" data-districts="futian,longgang,pingshan"><polyline class="sandbox-line sandbox-line--metro js-sandbox-route" data-road="line14" points="790,850 850,720 1000,630 1160,650 1260,640 1360,600" /><text class="sandbox-label" x="1190" y="625">14号线</text></g>
+                            </svg>
+                        </div>
+                    </div><!-- /#sandbox-map -->
+
+                    <span class="sandbox-frame__plaque" id="district-plaque">
+                        宝安区 · 线路与底图同比例定位
+                    </span>
+                </div><!-- /.sandbox-frame -->
+
+                <div class="district-route-list" id="district-route-list" aria-live="polite"></div>
+
+                <div class="sandbox-legend">
+                    <span class="sandbox-legend__item">
+                        <span class="sandbox-legend__line sandbox-legend__line--road"></span>
+                        🛣️ 公路干线
+                    </span>
+                    <span class="sandbox-legend__item">
+                        <span class="sandbox-legend__line sandbox-legend__line--metro"></span>
+                        🚇 城市轨道线路
+                    </span>
+                </div>
+
+                <!-- ========== 道路信息展示面板（点击热点后显示） ========== -->
+                <div id="road-info-panel" class="road-info-panel">
+                    <!-- 面板卡片内容由JS动态填充 -->
+                    <div class="road-info-panel__card" id="road-info-card">
+                        <div class="road-info-panel__name" id="road-info-name"></div>
+                        <div class="road-info-panel__desc" id="road-info-desc"></div>
+                    </div>
+                </div>
+
+                <!-- 默认占位提示（未点击时显示） -->
+                <div id="road-info-placeholder" class="road-info-panel__placeholder">
+                    👆 选择行政区，再点击地图线路或下方线路标签查看详细介绍
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ====== 模块四：底图与数据来源 ====== -->
+        <section class="exhibit-module" id="sources" aria-labelledby="sources-title">
+            <div class="exhibit-module__inner">
+                <div class="exhibit-module__header">
+                    <h2 class="exhibit-module__title" id="sources-title">底图与数据来源</h2>
+                    <p class="exhibit-module__subtitle">本页地图底图与统计数据均来自公开权威资料</p>
+                </div>
+                <div class="source-citation anim-fade-up">
+                    <p class="source-citation__title">📐 参考来源</p>
+                    <div class="source-citation__list">
+                        <span class="source-citation__item">
+                            🗺️ img/shenzhen_traffic_map.jpg —— 深圳交通示意底图
+                        </span>
+                        <span class="source-citation__item">
+                            🗺️ DataV.GeoAtlas —— 中国省级行政区划GeoJSON
+                        </span>
+                        <span class="source-citation__item">
+                            📊 中华人民共和国交通运输部 —— 高速公路通车里程数据
+                        </span>
+                        <span class="source-citation__item">
+                            📋 深圳市交通运输局 —— 道路与轨道运营数据
+                        </span>
+                    </div>
+                    <p style="margin-top: var(--space-md); font-size: var(--fs-caption); color: var(--color-text-light);">
+                        * 地图底图仅供展览参考，不作为行政划界依据
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+         四、统一页脚
+         ============================================================ -->
+    <footer class="museum-footer" role="contentinfo">
+        <div class="museum-footer__divider"></div>
+        <p>© 2026 深圳改革开放交通发展数字博物馆 版权所有</p>
+        <p class="museum-footer__meta">
+            本馆为数字展览项目 &nbsp;|&nbsp; 一图纵览鹏城交通脉络 · 见证城市发展足迹
+        </p>
+    </footer>
+
+    <!-- ===== ECharts CDN ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <!-- ===== 导航高亮 ===== -->
+    <script src="js/nav.js"></script>
+
+    <!-- ============================================================
+         五、双层沙盘交互逻辑（内联JS）
+         包含：全国热力图渲染 + 深圳沙盘5道路点击交互
+         ============================================================ -->
+    <script>
+    /**
+     * ============================================================
+     *  深圳交通数字博物馆 - 地图沙盘交互引擎
+     *  功能：
+     *    1. 上层：全国高速热力地图（ECharts + DataV GeoJSON）
+     *    2. 下层：深圳交通交互沙盘（5道路点击 → 信息面板）
+     *  所有道路介绍文字直接内置于此JS中，无外部依赖
+     * ============================================================
+     */
+    (function () {
+        'use strict';
+
+        // ---- DOM就绪检测 ----
+        function ready(fn) {
+            if (document.readyState !== 'loading') { fn(); }
+            else { document.addEventListener('DOMContentLoaded', fn); }
+        }
+
+        // ============================================================
+        //  第一部分：全国高速热力地图
+        //  使用 ECharts Map + DataV 中国GeoJSON
+        //  省份悬浮 → tooltip 显示高速通车里程
+        // ============================================================
+        function initHeatmap() {
+            var container = document.getElementById('chart-heatmap');
+            if (!container) return;
+            if (typeof echarts === 'undefined') {
+                document.getElementById('heatmap-loading').textContent = '⚠️ ECharts 未加载，热力图不可用';
+                return;
+            }
+
+            // ---- 各省高速公路通车里程数据（公里，截至2024年底/2025预测） ----
+            // ---- 数据来源：交通运输部历年统计公报 ----
+            var provinceData = [
+                { name: '广东省',     value: 11200 },
+                { name: '云南省',     value: 10500 },
+                { name: '四川省',     value:  9200 },
+                { name: '河北省',     value:  8700 },
+                { name: '贵州省',     value:  8500 },
+                { name: '山东省',     value:  8300 },
+                { name: '湖北省',     value:  8000 },
+                { name: '河南省',     value:  7900 },
+                { name: '湖南省',     value:  7800 },
+                { name: '广西壮族自治区', value: 7500 },
+                { name: '内蒙古自治区',   value: 7200 },
+                { name: '陕西省',     value:  7000 },
+                { name: '江西省',     value:  6800 },
+                { name: '福建省',     value:  6500 },
+                { name: '安徽省',     value:  6200 },
+                { name: '新疆维吾尔自治区', value: 6000 },
+                { name: '山西省',     value:  5800 },
+                { name: '浙江省',     value:  5500 },
+                { name: '甘肃省',     value:  5300 },
+                { name: '辽宁省',     value:  5000 },
+                { name: '吉林省',     value:  4600 },
+                { name: '江苏省',     value:  4500 },
+                { name: '重庆市',     value:  4400 },
+                { name: '黑龙江省',   value:  4200 },
+                { name: '青海省',     value:  3800 },
+                { name: '宁夏回族自治区', value: 2800 },
+                { name: '西藏自治区', value:  1800 },
+                { name: '海南省',     value:  1500 },
+                { name: '北京市',     value:  1300 },
+                { name: '天津市',     value:  1200 },
+                { name: '上海市',     value:   900 },
+                { name: '台湾省',     value:  1000 },
+                { name: '香港特别行政区', value: 200 },
+                { name: '澳门特别行政区', value:  50 }
+            ];
+
+            // ---- 加载中国 GeoJSON 并渲染地图 ----
+            var geojsonUrl = 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json';
+
+            fetch(geojsonUrl)
+                .then(function (resp) {
+                    if (!resp.ok) throw new Error('GeoJSON 加载失败: ' + resp.status);
+                    return resp.json();
+                })
+                .then(function (geoJson) {
+                    // 移除加载中提示
+                    var loadingEl = document.getElementById('heatmap-loading');
+                    if (loadingEl) { loadingEl.style.display = 'none'; }
+
+                    // 注册中国地图
+                    echarts.registerMap('china', geoJson);
+
+                    // 初始化图表
+                    var chart = echarts.init(container);
+
+                    var option = {
+                        backgroundColor: 'transparent',
+
+                        // 提示框：悬浮省份显示高速里程
+                        tooltip: {
+                            trigger: 'item',
+                            backgroundColor: 'rgba(26, 47, 68, 0.93)',
+                            borderColor: '#C4A65A',
+                            borderWidth: 1,
+                            textStyle: {
+                                color: '#E8E0D0',
+                                fontSize: 13,
+                                fontFamily: '"Microsoft YaHei", sans-serif'
+                            },
+                            formatter: function (params) {
+                                if (!params.data || params.data.value === undefined) {
+                                    return '<strong>' + params.name + '</strong><br/>数据收集中';
+                                }
+                                var val = params.data.value;
+                                return '<strong>' + params.name + '</strong><br/>'
+                                     + '<span style="display:inline-block;width:10px;height:10px;'
+                                     + 'border-radius:2px;background:#C4A65A;margin-right:6px;"></span>'
+                                     + '高速公路通车里程：<b>' + val.toLocaleString() + '</b> 公里';
+                            }
+                        },
+
+                        // 视觉映射：颜色越深 → 里程越高
+                        visualMap: {
+                            min: 0,
+                            max: 12000,
+                            left: 'left',
+                            top: 'center',
+                            text: ['高', '低'],
+                            textStyle: {
+                                color: '#5C5C5C',
+                                fontSize: 11,
+                                fontFamily: '"KaiTi", "STKaiti", serif'
+                            },
+                            inRange: {
+                                // 从浅米色渐变到深藏青（博物馆配色）
+                                color: [
+                                    '#EDE8DE',   // 极低
+                                    '#D4C4AE',   // 低
+                                    '#C4A65A',   // 中低
+                                    '#9A8268',   // 中
+                                    '#2C4A6B',   // 中高
+                                    '#1A2F44'    // 高
+                                ]
+                            },
+                            calculable: true,
+                            itemWidth: 14,
+                            itemHeight: 140
+                        },
+
+                        // 地图系列
+                        series: [{
+                            name: '高速公路通车里程',
+                            type: 'map',
+                            map: 'china',
+                            roam: false,            // 禁用缩放（保持简洁）
+                            zoom: 1.2,
+                            center: [104.5, 36],
+                            aspectScale: 0.85,
+                            label: {
+                                show: true,
+                                color: '#5C5C5C',
+                                fontSize: 10,
+                                fontFamily: '"Microsoft YaHei", sans-serif'
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    color: '#1A2F44',
+                                    fontSize: 13,
+                                    fontWeight: 'bold'
+                                },
+                                itemStyle: {
+                                    areaColor: '#C4A65A',
+                                    borderColor: '#FFFDF8',
+                                    borderWidth: 2,
+                                    shadowBlur: 12,
+                                    shadowColor: 'rgba(26, 47, 68, 0.4)'
+                                }
+                            },
+                            itemStyle: {
+                                borderColor: 'rgba(255, 253, 248, 0.6)',
+                                borderWidth: 1,
+                                areaColor: '#EDE8DE'
+                            },
+                            data: provinceData
+                        }]
+                    };
+
+                    chart.setOption(option);
+
+                    // 响应式缩放
+                    window.addEventListener('resize', function () { chart.resize(); });
+
+                    // 暴露实例
+                    window._museumHeatmap = chart;
+                })
+                .catch(function (err) {
+                    console.warn('[博物馆·沙盘] 中国地图加载失败: ' + err.message);
+                    var loadingEl = document.getElementById('heatmap-loading');
+                    if (loadingEl) {
+                        loadingEl.innerHTML = '⚠️ 地图数据加载失败（需联网获取中国GeoJSON）<br>'
+                                           + '<small>请检查网络连接后刷新页面</small>';
+                    }
+                });
+        }
+
+        // ============================================================
+        //  第二部分：深圳交通分区交互沙盘
+        //  线路与1880×1340底图共用坐标系，按行政区筛选并缩放
+        //  所有介绍文字直接在此JS中定义，无需额外文件
+        // ============================================================
+
+        /**
+         * 道路/线路信息数据（全部内置于此）
+         * key: data-road 属性值
+         * type: 'road' 公路 | 'metro' 地铁
+         */
+        var ROAD_DATA = {
+            /* ========== 公路干线 ========== */
+            guangshen: {
+                type: 'road',
+                name: '广深高速',
+                icon: '🛣️',
+                desc: '广深高速公路于1994年全线建成通车，是连接广州与深圳的交通大动脉，全长约122.8公里。作为中国大陆第一条由粤港合作、以合资模式建设的高速公路，广深高速开创了国内高速公路投融资体制改革的先河。通车后，广深之间行车时间由原来的4小时以上大幅缩短至1.5小时以内，彻底改变了特区对外货运与客运模式——过去依赖G107国道的货运车辆转向高速分流，深圳港的集装箱疏运效率成倍提升。广深高速日均车流量从通车初期的不足2万辆增长至如今的超过60万辆，是中国最繁忙的高速公路之一，被视为改革开放基建领域的标杆工程。'
+            },
+            g107: {
+                type: 'road',
+                name: 'G107国道',
+                icon: '🛤️',
+                desc: 'G107国道（北京—香港公路）是中国南北公路交通的主骨架之一，深圳段北起松岗与东莞长安交界，南至南头检查站，是1980年代深圳经济特区成立初期唯一承担对外联系的陆路国道。早期路面为砂石简易铺装，车流量巨大，承载了进出特区的几乎全部货运车辆——来自珠三角各地的建材、电子元器件、日用品经G107国道运入深圳，再经由罗湖口岸输往香港及海外。深南大道的前身路段——南头至上海宾馆段——最初便是依托G107国道进行拓宽和城市化改造而来。G107国道见证了深圳从边陲小镇到全球制造业中心的物流奇迹。'
+            },
+            g205: {
+                type: 'road',
+                name: 'G205国道',
+                icon: '🛤️',
+                desc: 'G205国道（山海关—深圳公路）是连接华北与华南的重要国道干线，深圳段北起惠深交界处，经龙岗区南下至罗湖区文锦渡口岸，是深圳连接惠州、河源乃至江西等内陆腹地的主要陆路通道。在1980至1990年代深圳"三来一补"加工贸易鼎盛时期，大量来自粤北、江西、湖南等地的务工人员经G205国道进入深圳，同时沿线布局的电子元器件、玩具、服装等加工厂高度依赖G205国道进行原材料与成品运输。G205国道打通了深圳北向连接内陆的物流命脉，支撑了深圳早期来料加工产业的崛起，对特区工业化的起步发挥了不可替代的作用。'
+            },
+            shennan: {
+                type: 'road',
+                name: '深南大道',
+                icon: '🛣️',
+                desc: '深南大道是深圳最为著名的城市主干道与景观大道，西起南头检查站，东至罗湖区沿河路，全长约28公里，最宽处达160米。深南大道始建于1979年深圳建市之初，最初仅为7米宽的简易沥青路（原名"深南路"），此后经五次大规模拓宽改造，于1990年代全线贯通。沿线串联起深圳特区几乎所有标志性地标——从深圳大学、科技园、世界之窗、华侨城到市民中心、华强北、东门商圈，被誉为"深圳第一路"与"中国改革开放的景观长廊"。深南大道不仅是城市交通主轴，更是深圳四十余年变迁的见证者与展示窗口。'
+            },
+            beihuan: {
+                type: 'road',
+                name: '北环大道',
+                icon: '🛣️',
+                desc: '北环大道是深圳市北部最重要的东西向城市快速路，西起南山区月亮湾大道，东至罗湖区泥岗路，全长约21公里，双向八至十车道，设计时速80公里。北环大道于1990年代初期建成通车，与深南大道、滨海大道共同构成深圳中心城区"三横"骨干路网。作为城市北部货运与通勤的核心走廊，北环大道承担了深圳大量东西向过境及内部交通流量，有效分流了深南大道压力。沿线连接广深高速、梅观高速、南坪快速等多条高快速路，是深圳"七横十三纵"路网体系中的关键横向通道。'
+            },
+
+            /* ========== 地铁线路 ========== */
+            line1: {
+                type: 'metro',
+                name: '深圳地铁1号线（罗宝线）',
+                icon: '🚇',
+                desc: '深圳地铁1号线（罗宝线）于2004年12月28日开通运营，是深圳第一条建成通车的地铁线路。线路东起罗湖站（与深圳火车站、罗湖口岸无缝衔接），西至机场东站，全长约41公里，设30座车站，沿深南大道核心段地下敷设，串联罗湖、福田、南山、宝安四大行政区。1号线开通标志着深圳正式进入轨道交通时代——在此之前，深圳市民出行完全依赖地面公交与出租车，深南大道早晚高峰严重拥堵。地铁1号线开通首日即吸引超过10万人次乘坐，如今日均客运量超过100万人次，是深圳地铁线网中客流量最大的骨干线路，被誉为"深圳城市轨道交通的起点与脊梁"。'
+            },
+            line2: {
+                type: 'metro',
+                name: '深圳地铁2号线（蛇口线）',
+                icon: '🚇',
+                desc: '深圳地铁2号线（蛇口线）于2010年12月28日开通运营，线路西起南山区赤湾站，东至罗湖区新秀站，全长约35.7公里，设29座车站。2号线沿深圳南部海岸线呈弧形走行，串联蛇口、后海、深圳湾、华侨城、福田中心区、华强北、罗湖等核心区域，是深圳地铁线网中唯一沿南部滨海走廊贯通东西的线路。2号线连接蛇口邮轮母港、深圳湾口岸两大跨境节点，同时覆盖深圳最集中的高端居住区与总部经济带，日均客运量超过70万人次，是深圳轨道交通网络中的"黄金南弧"。'
+            },
+            line3: {
+                type: 'metro',
+                name: '深圳地铁3号线（龙岗线）',
+                icon: '🚇',
+                desc: '深圳地铁3号线（龙岗线）于2010年12月28日开通运营，线路南起福田区益田站，北至龙岗区双龙站，全长约42.5公里，设31座车站。3号线是深圳东部第一条地铁线路，由市中心向东北方向辐射延伸，贯穿布吉、横岗、龙岗中心城等东部人口密集区域，从根本上改变了龙岗区与市中心之间的通勤格局——此前深惠公路（G205国道）是唯一陆路通道，高峰期拥堵严重。3号线的开通将龙岗中心城至福田中心区的通勤时间由原来的2小时以上压缩至50分钟以内，有力支撑了深圳"东进战略"。'
+            },
+            line4: {
+                type: 'metro',
+                name: '深圳地铁4号线（龙华线）',
+                icon: '🚇',
+                desc: '深圳地铁4号线（龙华线）南起福田口岸（连接香港东铁线落马洲站），北至龙华区牛湖站，全长约20.5公里，设16座车站。4号线一期（福田口岸—少年宫）于2004年开通，二期北延至清湖于2011年全线开通，由港铁轨道交通（深圳）有限公司运营，是内地首条由香港铁路公司运营的地铁线路。4号线沿深圳城市中轴线南北纵贯，串联福田CBD、深圳北站高铁枢纽及龙华新城，是深港跨境通勤与城市中轴发展的核心轨道交通干线，日均客运量超过60万人次。'
+            },
+            line11: {
+                type: 'metro',
+                name: '深圳地铁11号线（机场线）',
+                icon: '🚇',
+                desc: '深圳地铁11号线（机场线）于2016年6月28日开通运营，线路起于福田站，经前海、后海、碧海湾至碧头站，全长约51.9公里，是国内首条设置商务车厢的地铁线路。11号线最大特色是直达深圳宝安国际机场——由福田市中心至机场仅需30分钟，大幅优化了机场与城市核心区之间的通勤效率，彻底解决了此前仅依赖地铁1号线（需换乘公交）和机场大巴的出行痛点。11号线沿深圳西部沿海走廊敷设，串联前海自贸区、后海总部基地、宝安中心区等重点发展片区，有力支撑了深圳"西部发展轴"的城市战略布局，是深圳轨道交通从"服务通勤"向"引导城市发展"转型升级的代表线路。'
+            },
+
+            /* ========== 补充公路（6条） ========== */
+            jiahe: {
+                type: 'road',
+                name: '机荷高速（G15/S28）',
+                icon: '🛣️',
+                desc: '机荷高速公路西起宝安国际机场，东至龙岗区荷坳，全长约44公里，是深圳中部最重要的东西向高速大动脉。1997年机场至鹤洲段通车，1999年全线贯通。机荷高速串联深圳机场、广深高速、梅观高速、惠盐高速等关键节点，日均车流量超过30万辆，是深圳"七横十三纵"路网中最繁忙的横向通道之一。2024年，机荷高速改扩建工程启动，将成为国内首条立体复合高速公路——上层双向八车道+下层双向六车道，设计时速100公里。'
+            },
+            nanping: {
+                type: 'road',
+                name: '南坪快速路',
+                icon: '🛣️',
+                desc: '南坪快速路是深圳北部重要的东西向城市快速路，西起南山区前海，东至坪山区，全长约52公里，分三期建设。一期（塘朗—龙景）于2006年通车，二期2012年延伸至坪山，三期进一步向大鹏半岛辐射。全线设计时速80公里，双向六至八车道，是深圳"七横"快速路网中最长的一条横向通道。南坪快速有效分流了北环大道与机荷高速的货运压力，同时为深圳北部高新技术产业带（西丽、坂田、平湖）提供了高效的物流支撑。'
+            },
+            yanjiang: {
+                type: 'road',
+                name: '沿江高速（S3广深沿江高速）',
+                icon: '🛣️',
+                desc: '广深沿江高速公路（S3）于2013年全线通车，深圳段北起东莞长安交界，沿珠江东岸一路南下，经宝安机场、前海，至南山月亮湾，全长约51公里。沿江高速约85%的路线为海上高架桥，是中国首条大规模海上高速公路，被誉为"深圳最美海上高速"。通车后有效分流了广深高速约30%的车流量，缓解了广深走廊长期拥堵的困局。沿线可俯瞰伶仃洋与深中通道壮丽景观，是中国基建技术与滨海景观融合的典范工程。'
+            },
+            binhe: {
+                type: 'road',
+                name: '滨河大道—滨海大道',
+                icon: '🛣️',
+                desc: '滨河大道（罗湖段）与滨海大道（福田—南山段）相连，构成深圳南部沿海最重要的东西向城市快速路，全长约35公里，双向八至十车道。滨海大道于1999年建成通车，部分路段采用填海造地方式建设，串联红树林自然保护区、深圳湾公园、后海总部基地与前海。滨河大道则贯穿罗湖核心区，与罗湖口岸、文锦渡口岸实现快速连接。两路贯通后，从罗湖至蛇口全程无红绿灯，30分钟可达，是深圳"滨海城市"形象的最佳展示窗口。'
+            },
+            meiguan: {
+                type: 'road',
+                name: '梅观高速（G94珠三角环线）',
+                icon: '🛣️',
+                desc: '梅观高速公路北起龙华区观澜（接莞深高速），南至福田区梅林检查站（现已撤销），全长约19公里，1995年建成通车。梅观高速是深圳城市中轴线上最重要的南北向高速通道，承担深圳与东莞、广州方向的跨城交通，日均车流量超过20万辆。2014年梅观高速取消收费并启动市政化改造，拓宽为双向八车道+公交专用道，成为中国首条由政府回购并免费通行的高速公路，开创了高速公路市政化改革的先例。'
+            },
+            waihuan: {
+                type: 'road',
+                name: '深圳外环高速',
+                icon: '🛣️',
+                desc: '深圳外环高速公路是深圳最外围的环状高速，全长约93公里，分三期建设。一期（沿江高速—惠盐高速）2020年通车，串联宝安、光明、龙华、龙岗四区；二期（坪山段）及三期（大鹏段）规划建设中。外环高速设计时速100公里，双向六车道，是粤港澳大湾区"一环三射"高速公路网中"深圳环"的核心组成。外环高速将过境货运车辆引导至外围，大幅减轻机荷高速和南坪快速的通行压力，同时为大湾区东西两岸城市群提供高效互联通道。'
+            },
+            yanba: {
+                type: 'road',
+                name: '惠深沿海高速（盐坝段）',
+                icon: '🛣️',
+                desc: '惠深沿海高速盐坝段沿深圳东部海岸连接罗湖、盐田与大鹏方向，是东部滨海片区对外联系的重要快速通道。线路与盐田港疏港交通、东部景区交通共同构成深圳东部沿海走廊。图中仅标示其在深圳境内的大致走向，具体出入口和实时路况请以交通主管部门发布的信息为准。'
+            },
+            pengfei: {
+                type: 'road',
+                name: '坪西路—鹏飞路',
+                icon: '🛣️',
+                desc: '坪西路与鹏飞路共同承担大鹏半岛内部的重要交通联系，串联大鹏中心、较场尾及半岛沿线片区。受山海地形影响，大鹏新区的道路主要沿谷地和海岸展开，目前没有城市地铁运营线路，因此分区图重点标示公路走廊。图中线路为博物馆导览级示意。'
+            },
+
+            /* ========== 补充地铁（7条） ========== */
+            line5: {
+                type: 'metro',
+                name: '深圳地铁5号线（环中线）',
+                icon: '🚇',
+                desc: '深圳地铁5号线（环中线）于2011年6月22日开通运营，线路西起南山区赤湾站，东至罗湖区黄贝岭站，全长约47.4公里，设34座车站。5号线呈"倒U形"穿越深圳中心城区北部，串联前海、宝安中心、西丽大学城、深圳北站、坂田、布吉等关键节点，是深圳地铁线网中名副其实的"换乘之王"——全线34座车站中有超过20座为换乘站。5号线日均客运量超过120万人次，是深圳客流量最大的地铁线路之一，承担着城市北部环状客流组织的核心功能。'
+            },
+            line6: {
+                type: 'metro',
+                name: '深圳地铁6号线（光明线）',
+                icon: '🚇',
+                desc: '深圳地铁6号线（光明线）于2020年8月18日开通运营，线路南起福田区科学馆站，北至光明区松岗站，全长约49.4公里，设27座车站。6号线是深圳中部发展轴上的南北干线，彻底结束了光明区不通地铁的历史，将光明科学城至福田中心区的通勤时间由原来的90分钟压缩至45分钟以内。6号线支线进一步延伸至东莞黄江（深莞交界），是深圳首条跨市地铁线路，标志着深莞轨道交通一体化迈出实质性步伐。'
+            },
+            line7: {
+                type: 'metro',
+                name: '深圳地铁7号线（西丽线）',
+                icon: '🚇',
+                desc: '深圳地铁7号线（西丽线）于2016年10月28日开通运营，线路西起南山区西丽湖站，东至罗湖区太安站，全长约30.2公里，设28座车站。7号线沿深圳中心城区南缘走行，串联西丽大学城、车公庙商务区、华强北商圈、洪湖公园等重要节点，覆盖了深圳人口密度最高的多个大型居住区。7号线的开通大幅缓解了1号线和2号线在中心城区的客流压力，日均客运量超过60万人次，是深圳轨道交通内城加密网络的骨干线路。'
+            },
+            line9: {
+                type: 'metro',
+                name: '深圳地铁9号线（梅林线）',
+                icon: '🚇',
+                desc: '深圳地铁9号线（梅林线）于2016年10月28日与7号线同日开通运营，线路西起南山区红树湾南站，东至罗湖区文锦站，全长约25.4公里，设22座车站。9号线经深圳湾超级总部基地、下沙、车公庙、梅林、泥岗至文锦渡口岸，是深圳中心城区南部的又一条东西加密线。9号线的特殊意义在于：它是首条全线设置"同站台换乘"设计的地铁线路（与7号线在车公庙等站实现便捷换乘），同时连接了文锦渡口岸这一深港跨境通道，服务跨境通勤客流。'
+            },
+            line10: {
+                type: 'metro',
+                name: '深圳地铁10号线（坂田线）',
+                icon: '🚇',
+                desc: '深圳地铁10号线（坂田线）于2020年8月18日与6号线同日开通运营，线路南起福田区福田口岸站（连接香港东铁线落马洲站），北至龙岗区双拥街站，全长约29.3公里，设24座车站。10号线纵贯坂田街道——华为总部所在地，彻底解决了坂田片区长期依赖地面公交的出行困局。同时，10号线在福田口岸与香港东铁线实现跨境换乘，是继4号线之后的第二条深港跨境轨道交通走廊。10号线采用8节编组A型列车，运力较传统6节编组提升约30%。'
+            },
+            line12: {
+                type: 'metro',
+                name: '深圳地铁12号线（南宝线）',
+                icon: '🚇',
+                desc: '深圳地铁12号线（南宝线）于2022年11月28日开通运营，线路南起南山区左炮台东站，北至宝安区海上田园东站，全长约40.5公里，设33座车站。12号线沿深圳西部发展轴南北纵贯，串联蛇口自贸区、南山中心区、宝安中心区、机场东片区、大空港新城等关键节点，是深圳西部第一条南北向地铁大动脉。12号线开通后，南山至宝安沿线居民的轨道交通覆盖率提升超过一倍，有效支撑了前海—蛇口自贸区扩区后的交通需求。'
+            },
+            line14: {
+                type: 'metro',
+                name: '深圳地铁14号线（东部快线）',
+                icon: '🚇',
+                desc: '深圳地铁14号线（东部快线）于2022年10月28日开通运营，线路起于福田区岗厦北站，终至坪山区沙田站，全长约50.3公里，设18座车站，设计时速120公里，是深圳目前速度最快的地铁线路。14号线引入"快慢车"运营模式——快车仅停靠9座主要站点，将坪山中心至福田中心区的通勤时间由原来的2小时以上压缩至40分钟，真正实现了深圳"一小时通勤圈"对东部城区的全覆盖。14号线是深圳实施"东进战略"的核心交通支撑，为坪山高新区及东部先进制造业集群注入了强劲发展动力。'
+            }
+        };
+
+        /**
+         * 分区视窗使用底图原始像素坐标。x/y/w/h 是行政区在 1880×1340
+         * 底图上的导览范围；地图和SVG作为一个整体缩放，所以线路不会漂移。
+         */
+        var DISTRICT_VIEWS = {
+            city:      { name: '全市概览', x: 40,   y: 170, w: 1780, h: 1040 },
+            baoan:    { name: '宝安区',   x: 55,   y: 225, w: 540,  h: 815 },
+            guangming:{ name: '光明区',   x: 220,  y: 205, w: 505,  h: 430 },
+            longhua:  { name: '龙华区',   x: 465,  y: 405, w: 455,  h: 420 },
+            longgang: { name: '龙岗区',   x: 755,  y: 285, w: 735,  h: 545 },
+            pingshan: { name: '坪山区',   x: 1110, y: 405, w: 390,  h: 390 },
+            dapeng:   { name: '大鹏新区', x: 1330, y: 575, w: 500,  h: 570 },
+            nanshan:  { name: '南山区',   x: 290,  y: 740, w: 420,  h: 365 },
+            futian:   { name: '福田区',   x: 585,  y: 750, w: 325,  h: 280 },
+            luohu:    { name: '罗湖区',   x: 795,  y: 725, w: 285,  h: 275 },
+            yantian:  { name: '盐田区',   x: 995,  y: 660, w: 380,  h: 300 }
+        };
+
+        function initSandboxInteraction() {
+            var sandboxMap = document.getElementById('sandbox-map');
+            var stage = document.getElementById('sandbox-stage');
+            var routeLines = document.querySelectorAll('.js-sandbox-route');
+            var routeGroups = document.querySelectorAll('.sandbox-route-group');
+            var districtButtons = document.querySelectorAll('.district-switcher__btn');
+            var routeList = document.getElementById('district-route-list');
+            var plaque = document.getElementById('district-plaque');
+            var overlay = document.querySelector('.sandbox-overlay');
+            var infoPanel = document.getElementById('road-info-panel');
+            var infoName = document.getElementById('road-info-name');
+            var infoDesc = document.getElementById('road-info-desc');
+            var placeholder = document.getElementById('road-info-placeholder');
+            var requestedDistrict = new URLSearchParams(window.location.search).get('district');
+            var currentDistrict = DISTRICT_VIEWS[requestedDistrict] ? requestedDistrict : 'baoan';
+            var activeLine = null;
+
+            if (!sandboxMap || !stage || !routeLines.length || !infoPanel) return;
+
+            function clearSelection() {
+                if (activeLine) activeLine.classList.remove('sandbox-line--active');
+                activeLine = null;
+                if (overlay) overlay.classList.remove('sandbox-overlay--dimmed');
+                document.querySelectorAll('.district-route-list__btn.is-active').forEach(function (button) {
+                    button.classList.remove('is-active');
+                });
+                infoPanel.classList.remove('is-visible');
+                if (placeholder) placeholder.style.display = '';
+            }
+
+            function showRoadInfo(roadKey, lineEl) {
+                var data = ROAD_DATA[roadKey];
+                if (!data || !lineEl) return;
+                if (activeLine) activeLine.classList.remove('sandbox-line--active');
+                activeLine = lineEl;
+                lineEl.classList.add('sandbox-line--active');
+                if (overlay) overlay.classList.add('sandbox-overlay--dimmed');
+                document.querySelectorAll('.district-route-list__btn').forEach(function (button) {
+                    button.classList.toggle('is-active', button.getAttribute('data-road') === roadKey);
+                });
+                infoName.innerHTML = '<span class="road-info-panel__icon">' + data.icon + '</span>' + data.name;
+                infoDesc.textContent = data.desc;
+                infoPanel.classList.add('is-visible');
+                if (placeholder) placeholder.style.display = 'none';
+                infoPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function fitDistrict() {
+                var view = DISTRICT_VIEWS[currentDistrict];
+                if (!view) return;
+                var viewportWidth = sandboxMap.clientWidth;
+                var viewportHeight = sandboxMap.clientHeight;
+                var padding = currentDistrict === 'city' ? 16 : 34;
+                var scale = Math.min(
+                    (viewportWidth - padding * 2) / view.w,
+                    (viewportHeight - padding * 2) / view.h
+                );
+                var left = (viewportWidth - view.w * scale) / 2 - view.x * scale;
+                var top = (viewportHeight - view.h * scale) / 2 - view.y * scale;
+                stage.style.transform = 'translate(' + left.toFixed(2) + 'px,' + top.toFixed(2) + 'px) scale(' + scale.toFixed(4) + ')';
+            }
+
+            function renderRouteList(visibleLines) {
+                routeList.innerHTML = '';
+                visibleLines.forEach(function (line) {
+                    var key = line.getAttribute('data-road');
+                    var data = ROAD_DATA[key];
+                    if (!data) return;
+                    var button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'district-route-list__btn district-route-list__btn--' + data.type;
+                    button.setAttribute('data-road', key);
+                    button.textContent = data.name.replace('深圳地铁', '').replace(/（.*?）/g, '');
+                    button.addEventListener('click', function () { showRoadInfo(key, line); });
+                    routeList.appendChild(button);
+                });
+                if (!visibleLines.length) {
+                    routeList.textContent = currentDistrict === 'city'
+                        ? '请选择一个行政区查看公路与轨道线路'
+                        : '本区暂无已收录线路';
+                }
+            }
+
+            function selectDistrict(districtKey) {
+                if (!DISTRICT_VIEWS[districtKey]) return;
+                currentDistrict = districtKey;
+                clearSelection();
+                districtButtons.forEach(function (button) {
+                    var selected = button.getAttribute('data-district') === districtKey;
+                    button.classList.toggle('is-active', selected);
+                    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                });
+                var visibleLines = [];
+                routeGroups.forEach(function (group) {
+                    var districts = (group.getAttribute('data-districts') || '').split(',');
+                    // 全市模式显示全部线路；陆地遮罩负责隐藏市外留白和海面上的线段。
+                    var visible = districtKey === 'city' || districts.indexOf(districtKey) !== -1;
+                    group.classList.toggle('is-district-hidden', !visible);
+                    var line = group.querySelector('.js-sandbox-route');
+                    if (visible && line) visibleLines.push(line);
+                });
+                plaque.textContent = districtKey === 'city'
+                    ? '全市交通概览 · ' + visibleLines.length + ' 条交通线路可交互'
+                    : DISTRICT_VIEWS[districtKey].name + ' · ' + visibleLines.length + ' 条交通线路可交互';
+                renderRouteList(visibleLines);
+                requestAnimationFrame(fitDistrict);
+            }
+
+            routeLines.forEach(function (line) {
+                line.setAttribute('tabindex', '0');
+                line.setAttribute('role', 'button');
+                line.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    showRoadInfo(this.getAttribute('data-road'), this);
+                });
+                line.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        showRoadInfo(this.getAttribute('data-road'), this);
+                    }
+                });
+            });
+
+            districtButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    selectDistrict(this.getAttribute('data-district'));
+                });
+            });
+            sandboxMap.addEventListener('click', function (event) {
+                if (!event.target.closest('.js-sandbox-route')) clearSelection();
+            });
+            window.addEventListener('resize', fitDistrict);
+            selectDistrict(currentDistrict);
+        }
+
+        // ============================================================
+        //  第三部分：页面初始化
+        // ============================================================
+        ready(function () {
+            initHeatmap();            // 上层：全国高速热力图
+            initSandboxInteraction(); // 下层：深圳交通交互沙盘
+        });
+
+    })();
+    </script>
+
+    <!-- ===== 全局交互（滚动动画等） ===== -->
+    <script src="js/main.js"></script>
+
+</body>
+</html>
